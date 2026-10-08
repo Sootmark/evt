@@ -1,0 +1,14 @@
+plaso.tsv.gz: what plaso (the log2timeline/plaso:20260720 Docker image) reads
+from tests/fixtures/plaso/SysEvent.Evt with its winevt parser, one line per
+event (two per record: the time generated, as "creation", and the time
+written), sorted: offset, record number, which time, the time (Unix seconds),
+event identifier, message identifier, facility, severity, event type,
+category, source name, computer name, user SID, number of strings, the
+strings. Written from plaso's output, not from this crate.
+
+With SysEvent.Evt copied to /tmp/smo/evt/in/SysEvent.Evt:
+
+    sudo docker run --rm -v /tmp/smo/evt:/data log2timeline/plaso:20260720 log2timeline --status_view none -q --parsers 'winevt' --storage-file /data/out.plaso /data/in
+    sudo docker run --rm -v /tmp/smo/evt:/data log2timeline/plaso:20260720 psort --status_view none -q -o json_line -w /data/out.jsonl /data/out.plaso
+    python3 -I tests/oracle/plaso_tsv.py out.jsonl > tests/oracle/plaso.tsv
+    gzip -9n tests/oracle/plaso.tsv
